@@ -1,6 +1,6 @@
 import time
 from itertools import tee
-from neopixel import *
+# from neopixel import *
 import Adafruit_GPIO.SPI as SPI
 from xtermcolor import colorize
 import sys
@@ -20,7 +20,7 @@ PIXEL_COUNT = 300
 HARDWARE = 1
 SOFTWARE = 2
 
-MODE = HARDWARE
+MODE = SOFTWARE
 
 def set_mode(mode):
     if mode == 'hardware':
