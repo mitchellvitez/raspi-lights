@@ -1,0 +1,106 @@
+# rotate takes an array and a number and rotates that array by that number
+# darken takes an array and darkens each member of it
+# brighten takes an array and brightens each member of it
+# shifthue cycles through colors (next n hues on color wheel)
+# invert flips every color to its opposite
+
+# default arrays:
+# colors (goes in rainbow order)
+# randomcolors (different random color per pixel, changes each step)
+# white, black, red, orange, etc. (single color)
+
+array sparse
+  black -----* red
+
+effect
+> sparse
+  shifthue 12
+  rotate 1
+
+array a
+  blue *--*-- yellow
+
+array b
+  lime -*-**- green
+
+array c
+  b *--* black
+ 
+array everyThirdWhite
+  black --* white
+
+array everySeventhWhite
+  black ------* white
+ 
+array everyThirdWhiteEveryFifthRed
+  everyThirdWhite --*-- red
+ 
+array candyCane
+  red --***-* white
+
+array chunksOfFiveRedGreen
+  red *******------- green
+
+array diminishingBlue
+  blue *****-****--***---**----*-----**----***---****-- white
+
+showOffTheBlue
+> diminishingBlue
+  rotate 1
+  darken 8
+
+redGreenAlternating
+> chunksOfFiveRedGreen
+  rotate 7
+
+movieThing
+> everyThirdWhite
+  rotate 1
+
+movieThing2
+> everySeventhWhite
+  rotate 1
+
+
+fancy7
+> c
+  darken 5
+  shifthue 6
+  rotate 7
+
+fancy2
+> c
+  darken 5
+  shifthue 6
+  rotate 2
+
+fancy
+> c
+  darken 5
+  shifthue 6
+  rotate 1
+
+rainbowCycle
+> colors
+  rotate 5
+
+inversion
+> colors
+  invert 1
+
+# shifthue 12 means we cover the whole colorspace in 20 steps
+rainbowColors
+> red
+  shifthue 12
+
+randomDarken
+> randomcolors
+  darken 12
+
+brightnessDecrease
+> white
+  darken 15
+
+brightnessIncrease
+> black
+  brighten 15
