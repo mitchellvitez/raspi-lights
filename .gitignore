@@ -1,0 +1,5 @@
+.DS_Store
+PixllCompiler
+PixllCompiler.hi
+PixllCompiler.o
+__pycache__/
