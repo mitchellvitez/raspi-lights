@@ -104,3 +104,23 @@ brightnessDecrease
 brightnessIncrease
 > black
   brighten 15
+
+transform increaseRed
+  r + n
+  g
+  b
+
+transform brighten
+  r + n
+  g + n
+  b + n
+
+transform darken
+  r - n
+  g - n
+  b - n
+
+transform invert
+  255 - r
+  255 - g
+  255 - b

@@ -136,6 +136,46 @@ def brightnessIncrease(t):
         for i in all_pixels():
             set_pixel(i, arr[i])
 
+def increaseRed(gen, n):
+    def _increaseRed(c):
+        r, g, b = c
+        r = r + n
+        g = g
+        b = b
+        return (clamp(r), clamp(g), clamp(b))
+    gen.transform(_increaseRed)
+    return gen
+
+def brighten(gen, n):
+    def _brighten(c):
+        r, g, b = c
+        r = r + n
+        g = g + n
+        b = b + n
+        return (clamp(r), clamp(g), clamp(b))
+    gen.transform(_brighten)
+    return gen
+
+def darken(gen, n):
+    def _darken(c):
+        r, g, b = c
+        r = r - n
+        g = g - n
+        b = b - n
+        return (clamp(r), clamp(g), clamp(b))
+    gen.transform(_darken)
+    return gen
+
+def invert(gen, n):
+    def _invert(c):
+        r, g, b = c
+        r = 255 - r
+        g = 255 - g
+        b = 255 - b
+        return (clamp(r), clamp(g), clamp(b))
+    gen.transform(_invert)
+    return gen
+
 if __name__ == '__main__':
     set_mode('software')
 

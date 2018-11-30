@@ -16,6 +16,8 @@ type LightPattern = String
 type ArrayName = String
 type ProcedureName = String
 type TransformName = String
+type TransformationName = String
+type PythonCode = String
 
 data Transform = Transform TransformName Int
   deriving Show
@@ -23,6 +25,8 @@ data Transform = Transform TransformName Int
 data PixllVal = Array ArrayName LightPattern ArrayName ArrayName 
               | Comment String
               | Procedure ProcedureName ArrayName [Transform]
+              | Transformation TransformationName PythonCode PythonCode PythonCode
+
   deriving Show
 
 -- Compilation
@@ -52,6 +56,17 @@ toPython (Comment _) = "" -- We might do something with comments later
 toPython (Array name pattern arr1 arr2) =
   "def " ++ name ++ "():\n" ++
   "    return Array(\"" ++ pattern ++ "\", " ++ arr1 ++ "(), " ++ arr2 ++ "())\n\n"
+toPython (Transformation name setR setG setB) =
+  "def " ++ name ++ "(gen, n):\n" ++
+  "    def _" ++ name ++ "(c):\n" ++
+  "        r, g, b = c\n" ++
+  "        r = " ++ setR ++ "\n" ++
+  "        g = " ++ setG ++ "\n" ++
+  "        b = " ++ setB ++ "\n" ++
+  "        return (clamp(r), clamp(g), clamp(b))\n" ++
+  "    gen.transform(_" ++ name ++ ")\n" ++
+  "    return gen\n\n"
+
 toPython (Procedure procedureName arrName transforms) =
   "def " ++ procedureName ++ "(t):\n" ++
   "    arr = " ++ arrName ++ "()\n" ++
@@ -102,6 +117,20 @@ parseTransform = do
   newline
   return $ Transform name (read arg)
 
+parseTransformation :: Parser PixllVal
+parseTransformation = do
+  string "transform"
+  many nonNewlineSpace
+  name <- parseIdentifier
+  spaces
+  r <- many (noneOf "\n")
+  spaces
+  g <- many (noneOf "\n")
+  spaces
+  b <- many (noneOf "\n")
+  spaces
+  return $ Transformation name r g b
+
 parseProcedure :: Parser PixllVal
 parseProcedure = do
   name <- parseIdentifier
@@ -118,6 +147,7 @@ parseExpr :: Parser PixllVal
 parseExpr =
       parseComment
   <|> parseArray
+  <|> parseTransformation
   <|> parseProcedure
 
 parseFile :: Parser [PixllVal]

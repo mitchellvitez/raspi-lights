@@ -146,6 +146,14 @@ LIME=color(127,255,0)
 AUBERGINE=color(127,0,255)
 CERULEAN=color(0,127,255)
 
+def clamp(x):
+    if x > 255:
+        return 255
+    elif x < 0:
+        return 0
+    else:
+        return x
+
 # an Array is an infinite generator that keeps the first PIXEL_COUNT elements around for easy access
 class Array:
     def __init__(self, pattern, arr1, arr2):

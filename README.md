@@ -10,7 +10,7 @@ Pixll is a tiny infinite-array generation and transformation language used for c
 
 Take a look at `test.pxl`. You can compile this file by running `./PixllCompiler test.pxl > test.pxl-compiled.py`
 
-There are only two kinds of code blocks in Pixll (as well as comments which are just lines beginning with `#`). The first is an array declaration.
+There are only three kinds of code blocks in Pixll (as well as comments which are just lines beginning with `#`). The first is an array declaration.
 
 These begin with the keyword `array` followed by the name of the array. Then there are two array names separated by a "stars and bars" pattern. This pattern provides a way to combine the arrays on either side. Read the pattern from left to right. Every time you see a bar, fill in the next element of the left-hand array. Every time you see a star, fill in the next element of the right-hand array. This pattern cycles infinitely. In this way, very complicated arrays can be built up from interactions betwen simpler ones.
 
@@ -41,14 +41,28 @@ fadeToBlack
   darken 20
 ```
 
-Each transformation takes a single integer argument. The primitive transformations are:
+Each transformation takes a single integer argument. Some of the included library transformations are:
 - `rotate` - rotates array by that number of pixels
 - `darken` - takes an array and darkens each member of it
 - `brighten` - takes an array and brightens each member of it
 - `shifthue` - cycles through colors (runs through hues on color wheel)
 - `invert` - flips every color to its opposite
 
-You can write your own transformations in Python. You'll need to call `array.transform()` with a function that maps colors to colors. In Python, you can do this with a nested function that takes and returns an `(r, g, b)` tuple. Then the outer function can call `array.transform(innerFunction)`. Don't forget to import your custom transformations after you've written them.
+Finally, you can write your own simple transformations directly in Pixll. These take a color (r, g, b) and an argument (n). Each one begins with the keyword `transform`, and the name of the transformation. Following this are three lines, one each for red, green, and blue. When your transformation runs, it will run the operations on each of these lines and create a new color from the passed-in r, g, b, and n values. Each value is then automatically clamped to the range [0, 255].
+
+```
+transform increaseRed
+  r + n
+  g
+  b
+
+transform swapRedBlue
+  b
+  g
+  r
+```
+
+You can also write your own more complicated transformations in Python. You'll need to call `array.transform()` with a function that maps colors to colors. In Python, you can do this with a nested function that takes and returns an `(r, g, b)` tuple. Then the outer function can call `array.transform(innerFunction)`. Don't forget to import your custom transformations after you've written them.
 
 ```
 def increaseRed(array, arg):
@@ -70,7 +84,9 @@ The Pixll compiler is a small Haskell parser/printer that transpiles Pixll to Py
 
 You can build the compiler with `ghc PixllCompiler.hs`. Compilation takes a filename as the first argument and prints the result to stdout.
 
-This is a very simple compiler. You can see that it essentially parses a `.pxl` file to a syntax tree, converts each relevant element of that tree to Python code, and generates a little extra Python code that acts to select random functions from the `.pxl` file to keep the lights running.
+The compiler essentially parses a `.pxl` file to a syntax tree, converts each relevant element of that tree to Python code, and generates a little extra Python code that acts to select random functions from the `.pxl` file to keep the lights running.
+
+This is a very simple compiler. It doesn't even parse some of its expressions, just passes them along to Python in a more Pythonic form. As always, don't compile and run code you don't trust. In this case, it may contain arbitrary Python code!
 
 ## The raspilights Library
 
