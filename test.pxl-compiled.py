@@ -50,11 +50,11 @@ def showOffTheBlue(sh):
 
 def redGreenAlternating(sh):
     arr = chunksOfFiveRedGreen()
-    for _ in range(20):
+    for _ in range(10):
         arr = rotate(arr, 7)
         for i in all_pixels():
             set_pixel(i, arr[i])
-        sh(0.2)
+        sh(0.5)
 
 def movieThing(sh):
     arr = everyThirdWhite()
@@ -104,19 +104,19 @@ def fancy(sh):
 
 def rainbowCycle(sh):
     arr = colors()
-    for _ in range(20):
+    for _ in range(100):
         arr = rotate(arr, 5)
         for i in all_pixels():
             set_pixel(i, arr[i])
-        sh(0.2)
+        sh(0.1)
 
 def inversion(sh):
     arr = colors()
-    for _ in range(20):
+    for _ in range(3):
         arr = invert(arr, 1)
         for i in all_pixels():
             set_pixel(i, arr[i])
-        sh(0.2)
+        sh(2.0)
 
 def rainbowColors(sh):
     arr = red()

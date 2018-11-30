@@ -49,7 +49,7 @@ showOffTheBlue
   rotate 1
   darken 8
 
-redGreenAlternating
+redGreenAlternating 10@0.5
 > chunksOfFiveRedGreen
   rotate 7
 
@@ -80,11 +80,11 @@ fancy
   shifthue 6
   rotate 1
 
-rainbowCycle
+rainbowCycle 100@0.1
 > colors
   rotate 5
 
-inversion
+inversion 3@2
 > colors
   invert 1
 

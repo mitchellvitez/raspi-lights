@@ -3,6 +3,7 @@ import Data.List
 import Data.Char (isAlphaNum)
 import System.IO
 import System.Environment (getArgs)
+import Text.ParserCombinators.Parsec.Number (decimal, floating3)
 
 main :: IO ()
 main = do
@@ -22,9 +23,9 @@ type PythonCode = String
 data Transform = Transform TransformName Int
   deriving Show
 
-data PixllVal = Array ArrayName LightPattern ArrayName ArrayName 
+data PixllVal = Array ArrayName LightPattern ArrayName ArrayName
               | Comment String
-              | Procedure ProcedureName ArrayName [Transform]
+              | Procedure ProcedureName ArrayName [Transform] Int Double
               | Transformation TransformationName PythonCode PythonCode PythonCode
 
   deriving Show
@@ -42,11 +43,11 @@ compileToPython vals = "from raspilights import *\n\n" ++ concatMap toPython val
   "        proc(sh)\n"
 
 isProcedure :: PixllVal -> Bool
-isProcedure (Procedure _ _ _) = True
+isProcedure Procedure{} = True
 isProcedure _ = False
 
 procedureToString :: PixllVal -> String
-procedureToString (Procedure name _ _) = name
+procedureToString (Procedure name _ _ _ _) = name
 procedureToString _ = error "procedureToString can only convert procedures"
 
 toPython :: PixllVal -> String
@@ -65,14 +66,14 @@ toPython (Transformation name setR setG setB) =
   "    gen.transform(_" ++ name ++ ")\n" ++
   "    return gen\n\n"
 
-toPython (Procedure procedureName arrName transforms) =
+toPython (Procedure procedureName arrName transforms times speed) =
   "def " ++ procedureName ++ "(sh):\n" ++
   "    arr = " ++ arrName ++ "()\n" ++
-  "    for _ in range(20):\n" ++
+  "    for _ in range(" ++ show times ++ "):\n" ++
   (concatMap transformToPython transforms) ++
   "        for i in all_pixels():\n" ++
   "            set_pixel(i, arr[i])\n" ++
-  "        sh(0.2)\n\n"
+  "        sh(" ++ show speed ++ ")\n\n"
 
 transformToPython :: Transform -> String
 transformToPython (Transform transformName arg) =
@@ -88,7 +89,7 @@ parseComment = do
   return $ Comment contents
 
 parseIdentifier :: Parser String
-parseIdentifier = many1 (satisfy (\x -> isAlphaNum x || x == '_'))
+parseIdentifier = many1 $ satisfy (\x -> isAlphaNum x || x == '_')
 
 parseArray :: Parser PixllVal
 parseArray = do
@@ -112,9 +113,9 @@ parseTransform = do
   many nonNewlineSpace
   name <- parseIdentifier
   many nonNewlineSpace
-  arg <- many1 digit
+  arg <- decimal
   newline
-  return $ Transform name (read arg)
+  return $ Transform name arg
 
 parseTransformation :: Parser PixllVal
 parseTransformation = do
@@ -133,6 +134,10 @@ parseTransformation = do
 parseProcedure :: Parser PixllVal
 parseProcedure = do
   name <- parseIdentifier
+  optional nonNewlineSpace
+  times <- option 20 decimal
+  optional (char '@')
+  speed <- option 0.2 (floating3 True)
   spaces
   char '>'
   spaces
@@ -140,7 +145,7 @@ parseProcedure = do
   newline
   transforms <- many parseTransform
   spaces
-  return $ Procedure name startingArr transforms
+  return $ Procedure name startingArr transforms times speed
 
 parseExpr :: Parser PixllVal
 parseExpr =

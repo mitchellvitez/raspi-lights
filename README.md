@@ -30,7 +30,7 @@ There are primitive arrays for all the colors in `raspilights.py` (e.g. white, b
 
 ### Procedures
 
-Another kind of code block in Pixll denotes a procedure. These have a name, followed by an initial array with syntax `> ` in front, then a list of transformations that will be done to the array on each step
+Another kind of code block in Pixll denotes a procedure. These have a name, followed by an initial array with syntax `> ` in front, then a list of transformations that will be done to the array on each step. You can optionally denote how many steps will run and how long each step will be (in seconds) by adding `<steps>@<seconds_per_step>` after the procedure name. The default is 20 steps at 0.2 seconds per step.
 
 ```
 # A procedure which starts with the array above and at each step shifts the hue by 12 colors, and rotates the array by 1 pixel
@@ -39,8 +39,8 @@ myProcedure
   shifthue 12
   rotate 1
 
-# A white array that gets darker each step
-fadeToBlack
+# A white array that gets darker each step. Happens in 10 steps at 1/10 second per step
+fadeToBlack 10@0.1
 > white
   darken 20
 ```
@@ -100,7 +100,7 @@ This is a very simple compiler. It doesn't even parse some of its expressions, j
 
 raspilights has both hardware and software modes, which can be set via the respective flags in `raspilights.py`. In hardware mode, the library sends GPIO output from a Raspberry Pi to drive a WS2812B LED strip. In software mode, the library prints arrays of colored rectangles to stdout, simulating what would happen if your code were hooked up to a hardware LED strip.
 
-The number of pixels you have to play with is settable via `PIXEL_COUNT`. I've found that around 60 works well in software mode, and in hardware mode set this to the number of LEDs on my physical LED strip (in my case, 300).
+The number of pixels you have to play with is settable via `PIXEL_COUNT`. I've found that around 80 works well in software mode, and in hardware mode set this to the number of LEDs on the physical LED strip (in my case, 300).
 
 The library supports the following functions, where `i` is an integer from 0 up to `PIXEL_COUNT`, and colors are handled internally as (red, green, blue) tuples of integers between 0 and 255.
 
