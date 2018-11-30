@@ -1,11 +1,16 @@
+# Checklist for running on hardware:
+#   uncomment neopixel import
+#   set PIXEL_COUNT to number of physical LEDs
+#   set MODE to HARDWARE
+
 import time
 from itertools import tee
-# from neopixel import *
 import Adafruit_GPIO.SPI as SPI
 from xtermcolor import colorize
 import sys
 import random
 import colorsys
+# from neopixel import *
 
 # these LED_ flags are from https://github.com/jgarff/rpi_ws281x
 LED_PIN        = 18      # GPIO pin connected to the pixels (18 uses PWM!).
@@ -97,7 +102,12 @@ def set_all_pixels(color):
         pixels.set_pixel(i, color)
 
 def reversed_show(seconds=0.1):
-    pixels.reverse()
+    if MODE == HARDWARE:
+        p = [get_color(i) for i in range(PIXEL_COUNT)]
+        for i, x in enumerate(p[::-1]):
+            pixels.setPixelColor(i, x)
+    else:
+        pixels.reverse()
     show(seconds)
 
 def show(seconds=0.1):
