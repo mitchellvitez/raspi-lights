@@ -39,9 +39,7 @@ compileToPython vals = "from raspilights import *\n\n" ++ concatMap toPython val
   "    while True:\n" ++
   "        proc = random.choice(procedures)\n" ++
   "        sh = random.choice([show, reversed_show])\n" ++
-  "        for t in range(20):\n" ++
-  "            proc(t)\n" ++
-  "            sh(0.2)\n"
+  "        proc(sh)\n"
 
 isProcedure :: PixllVal -> Bool
 isProcedure (Procedure _ _ _) = True
@@ -68,12 +66,13 @@ toPython (Transformation name setR setG setB) =
   "    return gen\n\n"
 
 toPython (Procedure procedureName arrName transforms) =
-  "def " ++ procedureName ++ "(t):\n" ++
+  "def " ++ procedureName ++ "(sh):\n" ++
   "    arr = " ++ arrName ++ "()\n" ++
-  "    for _ in range(t):\n" ++
+  "    for _ in range(20):\n" ++
   (concatMap transformToPython transforms) ++
   "        for i in all_pixels():\n" ++
-  "            set_pixel(i, arr[i])\n\n"
+  "            set_pixel(i, arr[i])\n" ++
+  "        sh(0.2)\n\n"
 
 transformToPython :: Transform -> String
 transformToPython (Transform transformName arg) =

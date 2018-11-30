@@ -10,7 +10,9 @@ Pixll is a tiny infinite-array generation and transformation language used for c
 
 Take a look at `test.pxl`. You can compile this file by running `./PixllCompiler test.pxl > test.pxl-compiled.py`
 
-There are only three kinds of code blocks in Pixll (as well as comments which are just lines beginning with `#`). The first is an array declaration.
+There are only three kinds of declarations in Pixll (as well as comments which are just lines beginning with `#`): arrays, procedures, and transformations.
+
+### Arrays
 
 These begin with the keyword `array` followed by the name of the array. Then there are two array names separated by a "stars and bars" pattern. This pattern provides a way to combine the arrays on either side. Read the pattern from left to right. Every time you see a bar, fill in the next element of the left-hand array. Every time you see a star, fill in the next element of the right-hand array. This pattern cycles infinitely. In this way, very complicated arrays can be built up from interactions betwen simpler ones.
 
@@ -26,7 +28,9 @@ array combinedArr
 
 There are primitive arrays for all the colors in `raspilights.py` (e.g. white, black, red, orange, etc.). There are also two special primitive arrays: `colors`, which has the color wheel in rainbow order, and `randomcolors`, which generates an infinite array of random color values.
 
-The second kind of code block in Pixll denotes a procedure. These have a name, followed by an initial array with syntax `> ` in front, then a list of transformations that will be done to the array on each step
+### Procedures
+
+Another kind of code block in Pixll denotes a procedure. These have a name, followed by an initial array with syntax `> ` in front, then a list of transformations that will be done to the array on each step
 
 ```
 # A procedure which starts with the array above and at each step shifts the hue by 12 colors, and rotates the array by 1 pixel
@@ -47,6 +51,8 @@ Each transformation takes a single integer argument. Some of the included librar
 - `brighten` - takes an array and brightens each member of it
 - `shifthue` - cycles through colors (runs through hues on color wheel)
 - `invert` - flips every color to its opposite
+
+### Transformations
 
 Finally, you can write your own simple transformations directly in Pixll. These take a color (r, g, b) and an argument (n). Each one begins with the keyword `transform`, and the name of the transformation. Following this are three lines, one each for red, green, and blue. When your transformation runs, it will run the operations on each of these lines and create a new color from the passed-in r, g, b, and n values. Each value is then automatically clamped to the range [0, 255].
 

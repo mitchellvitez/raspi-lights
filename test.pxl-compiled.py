@@ -3,13 +3,14 @@ from raspilights import *
 def sparse():
     return Array("-----*", black(), red())
 
-def effect(t):
+def effect(sh):
     arr = sparse()
-    for _ in range(t):
+    for _ in range(20):
         arr = shifthue(arr, 12)
         arr = rotate(arr, 1)
         for i in all_pixels():
             set_pixel(i, arr[i])
+        sh(0.2)
 
 def a():
     return Array("*--*--", blue(), yellow())
@@ -38,103 +39,116 @@ def chunksOfFiveRedGreen():
 def diminishingBlue():
     return Array("*****-****--***---**----*-----**----***---****--", blue(), white())
 
-def showOffTheBlue(t):
+def showOffTheBlue(sh):
     arr = diminishingBlue()
-    for _ in range(t):
+    for _ in range(20):
         arr = rotate(arr, 1)
         arr = darken(arr, 8)
         for i in all_pixels():
             set_pixel(i, arr[i])
+        sh(0.2)
 
-def redGreenAlternating(t):
+def redGreenAlternating(sh):
     arr = chunksOfFiveRedGreen()
-    for _ in range(t):
+    for _ in range(20):
         arr = rotate(arr, 7)
         for i in all_pixels():
             set_pixel(i, arr[i])
+        sh(0.2)
 
-def movieThing(t):
+def movieThing(sh):
     arr = everyThirdWhite()
-    for _ in range(t):
+    for _ in range(20):
         arr = rotate(arr, 1)
         for i in all_pixels():
             set_pixel(i, arr[i])
+        sh(0.2)
 
-def movieThing2(t):
+def movieThing2(sh):
     arr = everySeventhWhite()
-    for _ in range(t):
+    for _ in range(20):
         arr = rotate(arr, 1)
         for i in all_pixels():
             set_pixel(i, arr[i])
+        sh(0.2)
 
-def fancy7(t):
+def fancy7(sh):
     arr = c()
-    for _ in range(t):
+    for _ in range(20):
         arr = darken(arr, 5)
         arr = shifthue(arr, 6)
         arr = rotate(arr, 7)
         for i in all_pixels():
             set_pixel(i, arr[i])
+        sh(0.2)
 
-def fancy2(t):
+def fancy2(sh):
     arr = c()
-    for _ in range(t):
+    for _ in range(20):
         arr = darken(arr, 5)
         arr = shifthue(arr, 6)
         arr = rotate(arr, 2)
         for i in all_pixels():
             set_pixel(i, arr[i])
+        sh(0.2)
 
-def fancy(t):
+def fancy(sh):
     arr = c()
-    for _ in range(t):
+    for _ in range(20):
         arr = darken(arr, 5)
         arr = shifthue(arr, 6)
         arr = rotate(arr, 1)
         for i in all_pixels():
             set_pixel(i, arr[i])
+        sh(0.2)
 
-def rainbowCycle(t):
+def rainbowCycle(sh):
     arr = colors()
-    for _ in range(t):
+    for _ in range(20):
         arr = rotate(arr, 5)
         for i in all_pixels():
             set_pixel(i, arr[i])
+        sh(0.2)
 
-def inversion(t):
+def inversion(sh):
     arr = colors()
-    for _ in range(t):
+    for _ in range(20):
         arr = invert(arr, 1)
         for i in all_pixels():
             set_pixel(i, arr[i])
+        sh(0.2)
 
-def rainbowColors(t):
+def rainbowColors(sh):
     arr = red()
-    for _ in range(t):
+    for _ in range(20):
         arr = shifthue(arr, 12)
         for i in all_pixels():
             set_pixel(i, arr[i])
+        sh(0.2)
 
-def randomDarken(t):
+def randomDarken(sh):
     arr = randomcolors()
-    for _ in range(t):
+    for _ in range(20):
         arr = darken(arr, 12)
         for i in all_pixels():
             set_pixel(i, arr[i])
+        sh(0.2)
 
-def brightnessDecrease(t):
+def brightnessDecrease(sh):
     arr = white()
-    for _ in range(t):
+    for _ in range(20):
         arr = darken(arr, 15)
         for i in all_pixels():
             set_pixel(i, arr[i])
+        sh(0.2)
 
-def brightnessIncrease(t):
+def brightnessIncrease(sh):
     arr = black()
-    for _ in range(t):
+    for _ in range(20):
         arr = brighten(arr, 15)
         for i in all_pixels():
             set_pixel(i, arr[i])
+        sh(0.2)
 
 def increaseRed(gen, n):
     def _increaseRed(c):
@@ -184,6 +198,4 @@ if __name__ == '__main__':
     while True:
         proc = random.choice(procedures)
         sh = random.choice([show, reversed_show])
-        for t in range(20):
-            proc(t)
-            sh(0.2)
+        proc(sh)
