@@ -6,7 +6,7 @@
 " Keywords
 syn keyword pixllKeyword array transform
 syn keyword pixllBuiltInTransform rotate darken brighten invert shifthue
-syn keyword pixllBuiltInArray black red green blue yellow cyan pink white dark_red dark_green dark_blue dark_yellow dark_cyan purple gray light_red light_green light_blue light_yellow light_pink light_cyan orange salmon aquamarine lime aubergine cerulean
+syn keyword pixllBuiltInArray colors randomcolors randomcolor black red green blue yellow cyan pink white dark_red dark_green dark_blue dark_yellow dark_cyan purple gray light_red light_green light_blue light_yellow light_pink light_cyan orange salmon aquamarine lime aubergine cerulean
 
 syn match pixllOperator '[-\*]*[@>+*/]\?'
 syn match pixllComment "#.*$"

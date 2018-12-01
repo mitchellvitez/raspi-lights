@@ -117,21 +117,6 @@ def default_colors():
 if __name__ == '__main__':
     set_mode('software')
 
-    procedures = [brightnessDecrease, rainbowCycle]
-
-    proc = random.choice(procedures)
-    for t in range(100):
-        proc(t)
-        show(0.05)
-
-    for t in range(100):
-        param_rainbow_colors(t)
-        show(0.05)
-
-    for t in range(100):
-        param_brightness_decrease(t)
-        show(0.05)
-
     red_green_alternating()
     default_colors()
     candy_cane(background=WHITE, foreground=RED)

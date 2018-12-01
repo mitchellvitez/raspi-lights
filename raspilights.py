@@ -99,7 +99,7 @@ def set_pixel(i, color):
 
 def set_all_pixels(color):
     for i in range(PIXEL_COUNT):
-        pixels.set_pixel(i, color)
+        set_pixel(i, color)
 
 def reversed_show(seconds=0.1):
     if MODE == HARDWARE:
@@ -257,17 +257,25 @@ def _colors():
 def randomcolors():
     return Array("*", _randomcolors(), _randomcolors())
 
+def randomcolor():
+    def _randomcolor():
+        c = random.choice(COLORS)
+        while True:
+            yield c
+    return Array("*", _randomcolor(), _randomcolor())
+
+
 def _randomcolors():
     while True:
         yield random_color()
 
-# Arrays for each default color
-
-# for color in ['BLACK', 'RED', 'GREEN', 'BLUE', 'YELLOW', 'CYAN', 'PINK', 'WHITE', 'GRAY', 'PURPLE',
-#             'DARK_RED', 'DARK_GREEN', 'DARK_BLUE', 'DARK_YELLOW', 'DARK_CYAN',
-#             'LIGHT_RED', 'LIGHT_GREEN', 'LIGHT_BLUE', 'LIGHT_YELLOW', 'LIGHT_PINK', 'LIGHT_CYAN',
-#             'ORANGE', 'SALMON', 'AQUAMARINE', 'LIME', 'AUBERGINE', 'CERULEAN']:
+COLORS = [BLACK, RED, GREEN, BLUE, YELLOW, CYAN, PINK, WHITE, GRAY, PURPLE,
+            DARK_RED, DARK_GREEN, DARK_BLUE, DARK_YELLOW, DARK_CYAN,
+            LIGHT_RED, LIGHT_GREEN, LIGHT_BLUE, LIGHT_YELLOW, LIGHT_PINK, LIGHT_CYAN,
+            ORANGE, SALMON, AQUAMARINE, LIME, AUBERGINE, CERULEAN]
 #     print(f'def _{color.lower()}():\n    while True: yield {color}\ndef {color.lower()}():\n    return Array("*", _{color.lower()}(), _{color.lower()}())')
+
+# Arrays for each default color
 def _black():
     while True: yield BLACK
 def black():
