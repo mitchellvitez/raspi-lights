@@ -13,12 +13,10 @@ import colorsys
 # from neopixel import *
 
 # these LED_ flags are from https://github.com/jgarff/rpi_ws281x
-LED_PIN        = 18      # GPIO pin connected to the pixels (18 uses PWM!).
 LED_FREQ_HZ    = 800000  # LED signal frequency in hertz (usually 800khz)
 LED_DMA        = 10      # DMA channel to use for generating signal (try 10)
 LED_BRIGHTNESS = 255     # Set to 0 for darkest and 255 for brightest
 LED_INVERT     = False   # True to invert the signal (when using NPN transistor level shift)
-LED_CHANNEL    = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
 
 PIXEL_COUNT = 80
 
@@ -61,20 +59,24 @@ class Pixels:
     def get_color(self, i):
         return self.pixels[i]
 
-pixels = Pixels()
+pixels = [Pixels()]
 if MODE == HARDWARE:
     # For WS2801 lights
     # pixels = ADA.WS2801Pixels(PIXEL_COUNT, spi=SPI.SpiDev(SPI_PORT, SPI_DEVICE), gpio=GPIO)
 
     # For WS2812 lights
-    pixels = Adafruit_NeoPixel(PIXEL_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
-    pixels.begin()
+    pixels = []
+    pixels.append(Adafruit_NeoPixel(PIXEL_COUNT, 18, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, 0))
+    pixels.append(Adafruit_NeoPixel(PIXEL_COUNT, 21, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, 0))
+    pixels.append(Adafruit_NeoPixel(PIXEL_COUNT, 19, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, 1))
 
-def get_color(i):
+    for pixel in pixels:
+        pixel.begin()
+
+def get_color(i, strip=0):
     if MODE == HARDWARE:
-        # return pixels.get_pixel_rgb(i)
-        return pixels.getPixelColor(i)
-    return pixels.get_color(i)
+        return pixels[strip].getPixelColor(i)
+    return pixels[strip].get_color(i)
 
 def all_pixels():
     return range(PIXEL_COUNT)
@@ -82,8 +84,8 @@ def all_pixels():
 def color(r, g, b):
     return (r, g, b)
 
-def clear():
-    pixels.clear()
+def clear(strip=0):
+    pixels[strip].clear()
 
 def all_colors():
     return [_wheel(x) for x in range(256)]
@@ -91,28 +93,31 @@ def all_colors():
 def random_color():
     return (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
 
-def set_pixel(i, color):
+def set_pixel(i, color, strip=0):
     if MODE == HARDWARE:
-        pixels.setPixelColor(i, Color(*color))
+        pixels[strip].setPixelColor(i, Color(*color))
     else:
-        pixels.set_pixel(i, color)
+        pixels[strip].set_pixel(i, color)
 
-def set_all_pixels(color):
+def set_all_pixels(color, strip=0):
     for i in range(PIXEL_COUNT):
-        set_pixel(i, color)
+        set_pixel(i, color, strip)
 
-def reversed_show(seconds=0.1):
+def reversed_show(seconds=0.1, strip=0):
     if MODE == HARDWARE:
         p = [get_color(i) for i in range(PIXEL_COUNT)]
         for i, x in enumerate(p[::-1]):
-            pixels.setPixelColor(i, x)
+            pixels[strip].setPixelColor(i, x)
     else:
-        pixels.reverse()
-    show(seconds)
+        pixels[strip].reverse()
+    show(seconds, strip)
 
-def show(seconds=0.1):
-    pixels.show()
+def show(seconds=0.1, strip=0):
+    pixels[strip].show()
     time.sleep(seconds)
+
+def show_no_delay(strip=0):
+    pixels[strip].show()
 
 def _wheel(pos):
     if pos < 85:
