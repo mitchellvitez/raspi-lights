@@ -1,0 +1,25 @@
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script type=text/javascript>
+  {% for proc_id in procedures.keys() %}
+    $(function() {
+      $('a#{{proc_id}}').bind('click', function() {
+        $.getJSON('/run/{{proc_id}}',
+            function(data) { });
+        return false;
+      });
+    });
+  {% endfor %}
+</script>
+
+<div class='container'>
+  <h1>Raspi Lights Web Controller</h1>
+  <form>
+    {% for proc_id, proc_name in procedures.items() %}
+    <p>
+      <a href="#" id="{{proc_id}}">
+        <button class='btn'>{{proc_name}}</button>
+      </a>
+    </p>
+    {% endfor %}
+  </form>
+</div>
