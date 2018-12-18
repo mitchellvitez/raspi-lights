@@ -56,6 +56,8 @@ Each transformation takes a single integer argument. Some of the included librar
 
 Finally, you can write your own simple transformations directly in Pixll. These take a color (r, g, b) and an argument (n). Each one begins with the keyword `transform`, and the name of the transformation. Following this are three lines, one each for red, green, and blue. When your transformation runs, it will run the operations on each of these lines and create a new color from the passed-in r, g, b, and n values. Each value is then automatically clamped to the range [0, 255].
 
+For a full explanation of supported operations, please see [Appendix A](#appendix-a-valid-transformation-operations).
+
 ```
 transform increaseRed
   r + n
@@ -119,3 +121,27 @@ In `raspilights.py`, an Array is an infinite generator that keeps the first `PIX
 ## The Raspi Lights Web Controller
 
 This project also comes with a small web app used for switching between different light patterns on the fly. Once you have Flask installed, just run `python app.py` on your Pi and go to `localhost:8000` with a device on your LAN. You'll see a list of buttons, which when clicked will switch the current light pattern to the one selected. You can add more patterns to this list by editing the `procedures` dictionary in `app.py`. 
+
+## Appendix A: Valid Transformation Operations
+
+Let `x` stand for any valid Pixll transformation expression. As well as integers, the following operations are valid:
+
+Pixll | Python | Name
+--- | --- | ---
+`(x)` | `(x)` | parenthesization
+`-x` | `-x` | unary negation
+`sqrt x` | `sqrt(x)` | square root
+`int x` | `int(x)` | cast to integer
+`x^x` | `x**x` | exponentiation
+`x*x` | `x*x` | multiplication
+`x/x` | `x/x` | floating point division
+`x//x` | `x//x` | integer division
+`x%x` | `x%x` | modulus
+`x+x` | `x+x` | addition
+`x-x` | `x-x` | subtraction
+`r` | `lambda (r, g, b): r` | red component
+`g` | `lambda (r, g, b): g` | green component
+`b` | `lambda (r, g, b): b` | blue component
+`n` | `def transform(n): ... n` | transform argument
+
+Note that `sqrt x` and `int x` bind tightly. That is to say `sqrt x^3` compiles to `sqrt(x)**3`, not `sqrt(x**3)`.
