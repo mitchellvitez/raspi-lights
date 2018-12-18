@@ -124,7 +124,7 @@ This project also comes with a small web app used for switching between differen
 
 ## Appendix A: Valid Transformation Operations
 
-Let `x` stand for any valid Pixll transformation expression. As well as integers, the following operations are valid:
+Let `x` stand for any valid Pixll transformation expression. As well as integer literals, the following operations are valid (listed in precedence order):
 
 Pixll | Python | Name
 --- | --- | ---
