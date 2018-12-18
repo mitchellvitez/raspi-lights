@@ -175,7 +175,8 @@ class Array:
     def __init__(self, pattern, arr1, arr2):
         self.next_gen = next_gen(pattern, arr1, arr2)
         self.elements = []
-        for i in range(PIXEL_COUNT):
+        BUFFER = 100
+        for i in range(PIXEL_COUNT + BUFFER):
             self.elements.append(next(self.next_gen))
 
     def __getitem__(self, i):

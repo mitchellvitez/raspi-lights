@@ -90,9 +90,7 @@ The Pixll compiler is a small Haskell parser/printer that transpiles Pixll to Py
 
 You can build the compiler with `ghc PixllCompiler.hs`. Compilation takes a filename as the first argument and prints the result to stdout.
 
-The compiler essentially parses a `.pxl` file to a syntax tree, converts each relevant element of that tree to Python code, and generates a little extra Python code that acts to select random functions from the `.pxl` file to keep the lights running.
-
-This is a very simple compiler. It doesn't even parse some of its expressions, just passes them along to Python in a more Pythonic form. As always, don't compile and run code you don't trust. In this case, it may contain arbitrary Python code!
+This is a very simple compiler. It essentially parses a `.pxl` file to a syntax tree, converts each relevant element of that tree to Python code, and generates a little extra Python code that acts to select random functions from the `.pxl` file to keep the lights running.
 
 ## The raspilights Library
 
@@ -117,3 +115,7 @@ The library supports the following functions, where `i` is an integer from 0 up 
 The library also supports many named color constants (`BLACK`, `WHITE`, `AUBERGINE`, etc.) which can be found by reading the source or looking at the default colors demo in `light_patterns.py`. Each color has a corresponding infinite Array. (The array names are lowercase, whereas the constants are uppercase)
 
 In `raspilights.py`, an Array is an infinite generator that keeps the first `PIXEL_COUNT` elements around for easy access. This lets us generate infinite lists of pixels and transform them in various ways. These are then used by the Pixll language to easily create and manipulate infinite Arrays.
+
+## The Raspi Lights Web Controller
+
+This project also comes with a small web app used for switching between different light patterns on the fly. Once you have Flask installed, just run `python app.py` on your Pi and go to `localhost:8000` with a device on your LAN. You'll see a list of buttons, which when clicked will switch the current light pattern to the one selected. You can add more patterns to this list by editing the `procedures` dictionary in `app.py`. 

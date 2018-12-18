@@ -33,4 +33,4 @@ def run(procedure):
     print (f"running procedure {procedure}")
     return (f"running procedure {procedure}")
 
-app.run(host='localhost')
+app.run(host='0.0.0.0')

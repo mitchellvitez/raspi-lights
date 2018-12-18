@@ -1,8 +1,10 @@
-import Text.ParserCombinators.Parsec
-import Data.List
 import Data.Char (isAlphaNum)
-import System.IO
+import Data.List
 import System.Environment (getArgs)
+import System.IO
+import Text.Parsec
+import Text.Parsec.Expr
+import Text.ParserCombinators.Parsec
 import Text.ParserCombinators.Parsec.Number (decimal, floating3)
 
 main :: IO ()
@@ -18,16 +20,34 @@ type ArrayName = String
 type ProcedureName = String
 type TransformName = String
 type TransformationName = String
-type PythonCode = String
+
+data Expr =
+    Paren Expr
+  | Neg Expr
+  | Sqrt Expr
+  | Rnd Expr
+  | Exp Expr Expr
+  | Mul Expr Expr
+  | Div Expr Expr
+  | IntDiv Expr Expr
+  | Mod Expr Expr
+  | Add Expr Expr
+  | Sub Expr Expr
+  | Number Int
+  | Red
+  | Blue
+  | Green
+  | Arg
+  deriving Show
 
 data Transform = Transform TransformName Int
   deriving Show
 
-data PixllVal = Array ArrayName LightPattern ArrayName ArrayName
-              | Comment String
-              | Procedure ProcedureName ArrayName [Transform] Int Double
-              | Transformation TransformationName PythonCode PythonCode PythonCode
-
+data PixllVal
+  = Array ArrayName LightPattern ArrayName ArrayName
+  | Comment String
+  | Procedure ProcedureName ArrayName [Transform] Int Double
+  | Transformation TransformationName Expr Expr Expr
   deriving Show
 
 -- Compilation
@@ -50,6 +70,27 @@ procedureToString :: PixllVal -> String
 procedureToString (Procedure name _ _ _ _) = name
 procedureToString _ = error "procedureToString can only convert procedures"
 
+py :: Expr -> String
+py (Paren x) = "(" ++ py x ++ ")"
+py (Neg x) = "-" ++ py x ++ ""
+py (Sqrt x) = "sqrt(" ++ py x ++ ")"
+py (Rnd x) = "int(" ++ py x ++ ")"
+py (Exp a b) = inf "**" a b
+py (Mul a b) = inf "*" a b
+py (Div a b) = inf "/" a b
+py (IntDiv a b) = inf "//" a b
+py (Mod a b) = inf "%" a b
+py (Add a b) = inf "+" a b
+py (Sub a b) = inf "-" a b
+py (Number x) = show x
+py Red = "r"
+py Green = "g"
+py Blue = "b"
+py Arg = "n"
+
+inf :: String -> Expr -> Expr -> String
+inf op a b = py a ++ op ++ py b
+
 toPython :: PixllVal -> String
 toPython (Comment _) = "" -- We might do something with comments later
 toPython (Array name pattern arr1 arr2) =
@@ -59,9 +100,9 @@ toPython (Transformation name setR setG setB) =
   "def " ++ name ++ "(gen, n):\n" ++
   "    def _" ++ name ++ "(c):\n" ++
   "        r, g, b = c\n" ++
-  "        r = " ++ setR ++ "\n" ++
-  "        g = " ++ setG ++ "\n" ++
-  "        b = " ++ setB ++ "\n" ++
+  "        r = " ++ py setR ++ "\n" ++
+  "        g = " ++ py setG ++ "\n" ++
+  "        b = " ++ py setB ++ "\n" ++
   "        return (clamp(r), clamp(g), clamp(b))\n" ++
   "    gen.transform(_" ++ name ++ ")\n" ++
   "    return gen\n\n"
@@ -117,17 +158,71 @@ parseTransform = do
   newline
   return $ Transform name arg
 
+-- LOGIC:
+-- x < x
+-- x <= x
+-- x > x
+-- x >= x
+-- x == x
+-- x != x
+
+-- not x
+
+-- x and x
+
+-- x or x
+
+-- x ? x : x
+--
+parseOperatorExpr :: Parsec String () Expr
+parseOperatorExpr = buildExpressionParser operators parseMathExpr
+
+operators = 
+  [
+    [ Infix (char '^' <* many nonNewlineSpace >> return Exp) AssocRight 
+    ]
+  , [ Infix (char '*' <* many nonNewlineSpace >> return Mul) AssocLeft
+    , Infix (string "//" <* many nonNewlineSpace >> return IntDiv) AssocLeft
+    , Infix (char '/' <* many nonNewlineSpace >> return Div) AssocLeft
+    , Infix (char '%' <* many nonNewlineSpace >> return Mod) AssocLeft
+    ]
+  , [ Infix (char '+' <* many nonNewlineSpace >> return Add) AssocLeft
+    , Infix (char '-' <* many nonNewlineSpace >> return Sub) AssocLeft
+    ]
+  ]
+
+parseMathExpr :: Parser Expr
+parseMathExpr =
+      Paren <$> between (char '(' <* many nonNewlineSpace) (char ')' <* many nonNewlineSpace) parseMathExpr
+  <|> prefixExpr Neg (char '-') <* many nonNewlineSpace
+  <|> prefixExpr Sqrt (string "sqrt") <* many nonNewlineSpace
+  <|> prefixExpr Rnd (string "int") <* many nonNewlineSpace
+  <|> Red <$ char 'r' <* many nonNewlineSpace
+  <|> Green <$ char 'g' <* many nonNewlineSpace
+  <|> Blue <$ char 'b' <* many nonNewlineSpace
+  <|> Arg <$ char 'n' <* many nonNewlineSpace
+  <|> Number . read <$> many1 digit <* many nonNewlineSpace
+
+prefixExpr :: (Expr -> Expr) -> Parser a -> Parser Expr
+prefixExpr n x = do
+  x
+  many nonNewlineSpace
+  e <- parseMathExpr
+  return $ n e
+
 parseTransformation :: Parser PixllVal
 parseTransformation = do
   string "transform"
   many nonNewlineSpace
   name <- parseIdentifier
   spaces
-  r <- many (noneOf "\n")
-  spaces
-  g <- many (noneOf "\n")
-  spaces
-  b <- many (noneOf "\n")
+  r <- parseOperatorExpr
+  char '\n'
+  many nonNewlineSpace
+  g <- parseOperatorExpr
+  char '\n'
+  many nonNewlineSpace
+  b <- parseOperatorExpr
   spaces
   return $ Transformation name r g b
 
