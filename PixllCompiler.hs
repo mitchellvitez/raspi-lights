@@ -6,14 +6,48 @@ import Text.Parsec
 import Text.Parsec.Expr
 import Text.ParserCombinators.Parsec
 import Text.ParserCombinators.Parsec.Number (decimal, floating3)
+import Text.Parsec.Error
 
 main :: IO ()
 main = do
   args <- getArgs
   input <- readFile $ head args
   case parse parseFile "PixllParser" input of
-    Left err -> hPutStrLn stderr $ show err
+    Left err -> hPutStrLn stderr $ showParseError (head args) input err
     Right val -> mapM_ putStrLn . lines $ compileToPython val
+
+showParseError :: FilePath -> String -> ParseError -> String
+showParseError file content err =
+  let pos = errorPos err
+      lineNum = sourceLine pos
+      col = sourceColumn pos
+      messages = errorMessages err
+      padLen = length . show $ lineNum + 2
+      line =
+        if length (lines content) > lineNum + 1
+        then lines content !! (lineNum - 1)
+        else ""
+      dashes = take (col - 1) (cycle " ")
+  in "Pixll syntax error in " <> file <> " at line " <> show lineNum <> " (column " <> show col <> ")" <> 
+      "\n" <> dashes <> "v\n" <>
+      line <> 
+      "\n" <> dashes <> "^" <>
+      showErrorMessages "\n" "Unknown" "\nExpecting one of:\n" "Did not expect" "End of file" messages <>
+      "\n\nIn context:\n" <>
+      safeLineNum padLen content (lineNum - 3) <> "\n" <>
+      safeLineNum padLen content (lineNum - 2) <> "\n" <>
+      leftPad padLen (lineNum) <> " X " <> line <> "\n" <>
+      safeLineNum padLen content lineNum <> "\n" <>
+      safeLineNum padLen content (lineNum + 1)
+
+leftPad :: Int -> Int -> String
+leftPad padLen x = reverse . take padLen $ reverse (show x) ++ cycle " "
+
+safeLineNum :: Int -> String -> Int -> String
+safeLineNum padLen content num =
+  if length (lines content) > num && num >= 0
+  then leftPad padLen (num + 1) <> " | " <> lines content !! (num)
+  else ""
 
 type LightPattern = String
 type ArrayName = String

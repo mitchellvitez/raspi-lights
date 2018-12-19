@@ -153,7 +153,7 @@ def brightnessIncrease(sh):
 def increaseRed(gen, n):
     def _increaseRed(c):
         r, g, b = c
-        r = r + n
+        r = r+n
         g = g
         b = b
         return (clamp(r), clamp(g), clamp(b))
@@ -163,9 +163,9 @@ def increaseRed(gen, n):
 def brighten(gen, n):
     def _brighten(c):
         r, g, b = c
-        r = r + n
-        g = g + n
-        b = b + n
+        r = r+n
+        g = g+n
+        b = b+n
         return (clamp(r), clamp(g), clamp(b))
     gen.transform(_brighten)
     return gen
@@ -173,9 +173,9 @@ def brighten(gen, n):
 def darken(gen, n):
     def _darken(c):
         r, g, b = c
-        r = r - n
-        g = g - n
-        b = b - n
+        r = r-n
+        g = g-n
+        b = b-n
         return (clamp(r), clamp(g), clamp(b))
     gen.transform(_darken)
     return gen
@@ -183,9 +183,9 @@ def darken(gen, n):
 def invert(gen, n):
     def _invert(c):
         r, g, b = c
-        r = 255 - r
-        g = 255 - g
-        b = 255 - b
+        r = 255-r
+        g = 255-g
+        b = 255-b
         return (clamp(r), clamp(g), clamp(b))
     gen.transform(_invert)
     return gen
