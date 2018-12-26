@@ -5,12 +5,12 @@
 
 import time
 from itertools import tee
-import Adafruit_GPIO.SPI as SPI
 from xtermcolor import colorize
 import sys
 import random
 import colorsys
 # from neopixel import *
+import traceback
 
 # these LED_ flags are from https://github.com/jgarff/rpi_ws281x
 LED_FREQ_HZ    = 800000  # LED signal frequency in hertz (usually 800khz)
@@ -53,7 +53,8 @@ class Pixels:
 
     def set_pixel(self, i, color):
         if not 0 <= i < PIXEL_COUNT:
-            print('Attempted to set a pixel out of range. Ignoring.')
+            traceback.print_stack()
+            print('Attempted to set a pixel out of range at index {}. Ignoring.'.format(i))
         else:
             self.pixels[i] = color
 
@@ -64,28 +65,30 @@ class Pixels:
         return self.pixels[i]
 
 class HardwarePixels:
-    def __init__(self, pin, channel, offset=0):
-        # For WS2812 lights
-        self.pixels = Adafruit_NeoPixel(PIXEL_COUNT, pin, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, channel)
-        self.pixels.begin()
+    def __init__(self, pixels, offset=0):
+        self.pixels = pixels
         self.offset = offset
-
-        # For WS2801 lights (not used in this project)
-        # pixels = ADA.WS2801Pixels(PIXEL_COUNT, spi=SPI.SpiDev(SPI_PORT, SPI_DEVICE), gpio=pin)
 
     def show(self):
         self.pixels.show()
 
     def reverse(self):
-        p = [self.get_color(i) for i in range(offset, offset + PIXEL_COUNT)]
+        p = [self.get_color(i) for i in range(self.offset, self.offset + PIXEL_COUNT)]
         for i, x in enumerate(p[::-1]):
             self.set_pixel(i, x)
 
     def set_pixel(self, i, color):
         if not 0 <= i < PIXEL_COUNT:
-            print('Attempted to set a pixel out of range. Ignoring.')
+            traceback.print_stack()
+            print('Attempted to set a pixel out of range at index {}. Ignoring.'.format(i))
         else:
-            self.pixels.setPixelColor(i + offset, Color(*color))
+            c = color if type(color) == int else Color(*color)
+            if self.offset == 0:
+                self.pixels.setPixelColor(i, c)
+            elif self.offset == 300:
+                self.pixels.setPixelColor(600 - i, c)
+            else:
+                print('Invalid offset!')
 
     def clear(self):
         self.pixels.clear()
@@ -95,11 +98,21 @@ class HardwarePixels:
 
 pixels = [Pixels(), Pixels(), Pixels(), Pixels()]
 if MODE == HARDWARE:
-    pixels = [ HardwarePixels(18, 0, offset=0)
-             , HardwarePixels(18, 0, offset=300)
-             , HardwarePixels(21, 0, offset=0)
-             , HardwarePixels(21, 0, offset=300)
+    # For WS2812 lights
+    # This is for a very specific hardware setup, change as desired.
+    one = Adafruit_NeoPixel(600, 18, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, 0)
+    one.begin()
+    two = Adafruit_NeoPixel(600, 19, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, 1)
+    two.begin()
+
+    pixels = [ HardwarePixels(one, offset=0)
+             , HardwarePixels(one, offset=300)
+             , HardwarePixels(two, offset=0)
+             , HardwarePixels(two, offset=300)
              ]
+
+    # For WS2801 lights (not used in this project)
+    # pixels = ADA.WS2801Pixels(PIXEL_COUNT, spi=SPI.SpiDev(SPI_PORT, SPI_DEVICE), gpio=pin)
 
 def get_color(i, strip=0):
     return pixels[strip].get_color(i)
@@ -131,7 +144,7 @@ def set_pixel(i, color, strip=ALL_STRIPS):
 
 def set_all_pixels(color, strip=ALL_STRIPS):
     for strip in get_strips(strip):
-        for i in range(PIXEL_COUNT):
+        for i in all_pixels():
             pixels[strip].set_pixel(i, color)
 
 def reversed_show(seconds=0.1, strip=ALL_STRIPS):
