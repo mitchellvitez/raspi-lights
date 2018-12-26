@@ -17,6 +17,18 @@ effect
   shifthue 12
   rotate 1
 
+array rg
+  red *****----- green
+
+array rgb
+  rg *****----- blue
+
+array rgby
+  rgb *****----- yellow
+
+array rgbys
+  rgby **********----- black
+
 array a
   blue *--*-- yellow
 
@@ -43,6 +55,10 @@ array chunksOfFiveRedGreen
 
 array diminishingBlue
   blue *****-****--***---**----*-----**----***---****-- white
+
+rotateColors 100@0.05
+> rgbys
+  rotate 1
 
 showOffTheBlue
 > diminishingBlue

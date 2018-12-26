@@ -12,6 +12,18 @@ def effect(sh):
             set_pixel(i, arr[i])
         sh(0.2)
 
+def rg():
+    return Array("*****-----", red(), green())
+
+def rgb():
+    return Array("*****-----", rg(), blue())
+
+def rgby():
+    return Array("*****-----", rgb(), yellow())
+
+def rgbys():
+    return Array("**********-----", rgby(), black())
+
 def a():
     return Array("*--*--", blue(), yellow())
 
@@ -38,6 +50,14 @@ def chunksOfFiveRedGreen():
 
 def diminishingBlue():
     return Array("*****-****--***---**----*-----**----***---****--", blue(), white())
+
+def rotateColors(sh):
+    arr = rgbys()
+    for _ in range(100):
+        arr = rotate(arr, 1)
+        for i in all_pixels():
+            set_pixel(i, arr[i])
+        sh(5.0e-2)
 
 def showOffTheBlue(sh):
     arr = diminishingBlue()
@@ -193,7 +213,7 @@ def invert(gen, n):
 if __name__ == '__main__':
     set_mode('software')
 
-    procedures = [effect,showOffTheBlue,redGreenAlternating,movieThing,movieThing2,fancy7,fancy2,fancy,rainbowCycle,inversion,rainbowColors,randomDarken,brightnessDecrease,brightnessIncrease]
+    procedures = [effect,rotateColors,showOffTheBlue,redGreenAlternating,movieThing,movieThing2,fancy7,fancy2,fancy,rainbowCycle,inversion,rainbowColors,randomDarken,brightnessDecrease,brightnessIncrease]
 
     while True:
         proc = random.choice(procedures)
